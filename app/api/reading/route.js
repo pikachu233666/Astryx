@@ -3,9 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 export const runtime = "nodejs";
 
 const ai = new GoogleGenAI({
-  vertexai: true,
-  project: process.env.GOOGLE_CLOUD_PROJECT,
-  location: process.env.GOOGLE_CLOUD_LOCATION || "global"
+  apiKey: process.env.GEMINI_API_KEY
 });
 
 export async function POST(req) {
