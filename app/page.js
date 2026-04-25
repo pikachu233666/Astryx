@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import jsPDF from "jspdf";
 import {
   Sparkles,
   Calendar,
@@ -96,6 +97,104 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [view, setView] = useState("form");
+
+function handleDownloadPDF() {
+  if (!profile && !reading) return;
+
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "pt",
+    format: "a4"
+  });
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 48;
+  let y = 56;
+
+  function addTitle(text) {
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(20);
+    pdf.text(text, margin, y);
+    y += 30;
+  }
+
+  function addHeading(text) {
+    if (y > pageHeight - 80) {
+      pdf.addPage();
+      y = 56;
+    }
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.text(text, margin, y);
+    y += 20;
+  }
+
+  function addText(text) {
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+
+    const lines = pdf.splitTextToSize(String(text || ""), pageWidth - margin * 2);
+
+    lines.forEach((line) => {
+      if (y > pageHeight - 50) {
+        pdf.addPage();
+        y = 56;
+      }
+
+      pdf.text(line, margin, y);
+      y += 14;
+    });
+
+    y += 8;
+  }
+
+  addTitle("Astryx Fusion Report");
+
+  if (profile) {
+    addHeading("Basic Profile");
+    addText(`Name: ${form.name || "Unknown"}`);
+    addText(`Birth Date: ${form.birthDate || "Unknown"}`);
+    addText(`Birth Time: ${form.birthTime || "Unknown"}`);
+    addText(`Birth City: ${form.birthCity || "Unknown"}`);
+
+    addHeading("BaZi Summary");
+    addText(`Day Master: ${profile.dayStemCN || profile.dayStem} · ${profile.dayMaster}`);
+    addText(`Chinese Zodiac: ${profile.chineseZodiac}`);
+    addText(`Strength: ${profile.strength?.status}`);
+    addText(`Dominant Element: ${profile.dominantElement}`);
+
+    addHeading("Western Astrology Summary");
+    addText(`Sun: ${profile.westernSign}`);
+    addText(`Moon: ${profile.moonSign}`);
+    addText(`Ascendant: ${profile.ascendant}`);
+    addText(`Mercury: ${profile.mercurySign}`);
+    addText(`Venus: ${profile.venusSign}`);
+    addText(`Mars: ${profile.marsSign}`);
+
+    addHeading("Five Elements");
+    addText(
+      Object.entries(profile.elementCount || {})
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(" | ")
+    );
+  }
+
+  if (reading) {
+    addHeading("AI Fusion Reading");
+
+    const cleanReading = reading
+      .replace(/---/g, "\n")
+      .replace(/\*\*(.*?)\*\*/g, "$1")
+      .replace(/\*(.*?)\*/g, "$1")
+      .replace(/^##\s*/gm, "");
+
+    addText(cleanReading);
+  }
+
+  pdf.save("astryx-fusion-report.pdf");
+}
 
   async function handleGenerate(e) {
     e.preventDefault();
@@ -451,7 +550,7 @@ export default function Home() {
             </>
           )}
           
-          <AIReadingCard profile={profile} loading={loading} reading={reading} />
+          <AIReadingCard profile={profile} loading={loading} reading={reading} onDownload={handleDownloadPDF} />
         </div>
       </section>
 )}
@@ -903,7 +1002,7 @@ function PlanetCard({ planet }) {
   );
 }
 
-function AIReadingCard({ profile, loading, reading }) {
+function AIReadingCard({ profile, loading, reading, onDownload }) {
   return (
     <div className="glass relative overflow-hidden rounded-[2rem] p-8">
       <div className="absolute right-[-80px] top-[-80px] h-56 w-56 rounded-full bg-purple-500/20 blur-3xl" />
@@ -918,6 +1017,14 @@ function AIReadingCard({ profile, loading, reading }) {
 
             <div>
               <h2 className="font-serif text-3xl">Fusion Reading</h2>
+              {(profile || reading) && (
+                  <button
+                    onClick={onDownload}
+                    className="mt-4 rounded-full border border-purple-300/30 px-5 py-2 text-sm text-purple-100 transition hover:bg-purple-500/10"
+                  >
+                    Download PDF Report
+                  </button>
+                )}
               <p className="mt-1 text-sm text-white/50">
                 BaZi × Astrology × Personalized Guidance
               </p>
