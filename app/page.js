@@ -413,7 +413,6 @@ export default function Home() {
               </div>
 
               <DayMasterStrength profile={profile} />
-              <LuckCycleCard profile={profile} />
               <div className="glass rounded-[2rem] p-6">
                 <h3 className="mb-5 font-serif text-3xl">Five Elements Balance</h3>
                 <div className="grid gap-4 md:grid-cols-5">
@@ -485,8 +484,7 @@ function BaZiEightCharacters({ profile }) {
     <div className="glass rounded-[2rem] p-6">
       <h3 className="mb-2 font-serif text-3xl">BaZi Eight Characters Chart</h3>
       <p className="mb-5 text-sm text-white/55">
-        Each pillar contains one Heavenly Stem and one Earthly Branch. Colors represent
-        Yin-Yang Five Element qualities.
+        Each pillar contains one Heavenly Stem and one Earthly Branch. Colors represent Yin-Yang Five Element qualities.
       </p>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -571,38 +569,154 @@ function DayMasterStrength({ profile }) {
   );
 }
 
+
 function FiveElementCycle() {
+  const elements = [
+    { name: "Fire", color: "#dc2626", x: 50, y: 12 },
+    { name: "Earth", color: "#9a4a14", x: 84, y: 38 },
+    { name: "Metal", color: "#b8860b", x: 71, y: 80 },
+    { name: "Water", color: "#1d4ed8", x: 29, y: 80 },
+    { name: "Wood", color: "#047857", x: 16, y: 38 }
+  ];
+
+  const pos = Object.fromEntries(elements.map((e) => [e.name, e]));
+
+  const generating = [
+    ["Wood", "Fire"],
+    ["Fire", "Earth"],
+    ["Earth", "Metal"],
+    ["Metal", "Water"],
+    ["Water", "Wood"]
+  ];
+
+  const controlling = [
+    ["Wood", "Earth"],
+    ["Earth", "Water"],
+    ["Water", "Fire"],
+    ["Fire", "Metal"],
+    ["Metal", "Wood"]
+  ];
+
   return (
     <div className="glass rounded-[2rem] p-6">
       <h3 className="mb-5 font-serif text-3xl">Five Elements Cycle</h3>
 
-      <div className="grid gap-5 md:grid-cols-2">
+      <div className="mx-auto max-w-[620px] rounded-[2rem] border border-white/10 bg-white/[0.03] p-4">
+        <svg viewBox="0 0 100 100" className="h-full w-full">
+          <defs>
+            <marker
+              id="genArrow"
+              markerWidth="5"
+              markerHeight="5"
+              refX="4"
+              refY="2.5"
+              orient="auto"
+            >
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="rgba(255,255,255,0.65)" />
+            </marker>
+
+            <marker
+              id="ctrlArrow"
+              markerWidth="5"
+              markerHeight="5"
+              refX="4"
+              refY="2.5"
+              orient="auto"
+            >
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="rgba(167,139,250,0.9)" />
+            </marker>
+          </defs>
+
+          {/* Generating outer cycle */}
+          {generating.map(([from, to]) => (
+            <motion.line
+              key={`gen-${from}-${to}`}
+              x1={pos[from].x}
+              y1={pos[from].y}
+              x2={pos[to].x}
+              y2={pos[to].y}
+              stroke="rgba(255,255,255,0.45)"
+              strokeWidth="0.8"
+              strokeDasharray="3 2"
+              markerEnd="url(#genArrow)"
+              animate={{ strokeDashoffset: [0, -12] }}
+              transition={{ repeat: Infinity, duration: 1.4, ease: "linear" }}
+            />
+          ))}
+
+          {/* Controlling pentagram */}
+          {controlling.map(([from, to]) => (
+            <motion.line
+              key={`ctrl-${from}-${to}`}
+              x1={pos[from].x}
+              y1={pos[from].y}
+              x2={pos[to].x}
+              y2={pos[to].y}
+              stroke="rgba(139,92,246,0.75)"
+              strokeWidth="1.1"
+              markerEnd="url(#ctrlArrow)"
+              animate={{ opacity: [0.35, 1, 0.35] }}
+              transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
+            />
+          ))}
+
+          {/* Element nodes */}
+          {elements.map((el, index) => (
+            <g key={el.name}>
+              <motion.circle
+                cx={el.x}
+                cy={el.y}
+                r="8.5"
+                fill={el.color}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: [1, 1.06, 1], opacity: 1 }}
+                transition={{
+                  delay: index * 0.12,
+                  duration: 1.8,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{ transformOrigin: `${el.x}px ${el.y}px` }}
+              />
+
+              <text
+                x={el.x}
+                y={el.y + 1.2}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="white"
+                fontSize="4"
+                fontFamily="Georgia, serif"
+              >
+                {el.name}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <h4 className="mb-3 font-serif text-2xl text-purple-100">
+          <h4 className="mb-3 font-serif text-xl text-purple-100">
             Generating Cycle
           </h4>
-          {Object.entries(generatingCycle).map(([from, to]) => (
-            <p key={from} className="text-sm leading-7 text-white/65">
-              {from} generates {to}
-            </p>
-          ))}
+          <p className="text-sm leading-7 text-white/65">
+            Wood → Fire → Earth → Metal → Water → Wood
+          </p>
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <h4 className="mb-3 font-serif text-2xl text-purple-100">
+          <h4 className="mb-3 font-serif text-xl text-purple-100">
             Controlling Cycle
           </h4>
-          {Object.entries(controllingCycle).map(([from, to]) => (
-            <p key={from} className="text-sm leading-7 text-white/65">
-              {from} controls {to}
-            </p>
-          ))}
+          <p className="text-sm leading-7 text-white/65">
+            Wood → Earth → Water → Fire → Metal → Wood
+          </p>
         </div>
       </div>
     </div>
   );
 }
-
 function NatalWheel({ profile }) {
   return (
     <div className="glass rounded-[2rem] p-6">
@@ -841,52 +955,50 @@ function SkeletonLine({ width }) {
 }
 
 function FormattedReading({ text }) {
-  const lines = text.split("\n");
+  const sections = text.split("\n---\n");
+
+  return (
+    <div className="space-y-6">
+      {sections.map((section, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-purple-400/30 hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]"
+            >
+          <MarkdownSection content={section} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MarkdownSection({ content }) {
+  const lines = content.split("\n");
 
   return (
     <div className="space-y-3">
-      {lines.map((line, index) => {
+      {lines.map((line, i) => {
         const clean = line.trim();
 
-        if (!clean) {
-          return <div key={index} className="h-2" />;
-        }
+        if (!clean) return null;
 
         if (clean.startsWith("##")) {
           return (
-            <h3
-              key={index}
-              className="mt-8 font-serif text-2xl text-purple-100 first:mt-0"
-            >
+            <h3 key={i} className="font-serif text-2xl text-purple-100">
               {clean.replace(/^##\s*/, "")}
             </h3>
           );
         }
 
-        if (/^\d+\./.test(clean)) {
-          return (
-            <p
-              key={index}
-              className="rounded-xl border border-purple-300/15 bg-purple-500/10 px-4 py-3 text-white/75"
-            >
-              {clean}
-            </p>
-          );
-        }
-
         if (clean.startsWith("-")) {
           return (
-            <p
-              key={index}
-              className="ml-4 border-l border-purple-300/30 pl-4 text-white/70"
-            >
-              {clean.replace(/^-\s*/, "")}
+            <p key={i} className="ml-4 text-white/70">
+              • {clean.replace(/^-\s*/, "")}
             </p>
           );
         }
 
         return (
-          <p key={index} className="leading-8 text-white/75">
+          <p key={i} className="text-white/75 leading-7">
             {clean}
           </p>
         );

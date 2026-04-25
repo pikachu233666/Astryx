@@ -15,6 +15,14 @@ export async function POST(req) {
     const prompt = `
 You are Astryx, a premium self-reflection assistant that combines Eastern BaZi (Four Pillars) and Western Astrology.
 
+IMPORTANT FORMAT RULES:
+
+- Output MUST be in Markdown
+- Use "## Section Title" for each section
+- Separate each section with "---" on its own line
+- Do NOT merge sections
+- Do NOT skip separators
+
 IMPORTANT:
 - Everything must be written in clear English.
 - Do NOT use Chinese characters or Chinese metaphysics terms.
@@ -135,19 +143,13 @@ Combine:
 - Day Master
 - Sun + Mars + Saturn
 
-8. Core Challenge
-Describe ONE key internal conflict
-
-9. 30-Day Action Plan
+8. 30-Day Action Plan
 Give 5 specific, realistic actions
 
-10. Major Luck Cycle
-Explain the luck cycle direction, start age, and first few ten-year cycles.
-
-11. Useful Element Strategy
+9. Useful Element Strategy
 Explain the favorable elements and how they guide personality, career, and decision-making.
 
-12. Personality and Wellness Reflection
+10. Personality and Wellness Reflection
 Give a gentle wellness-oriented reflection based on element balance.
 Do not provide diagnosis or medical advice.
 
