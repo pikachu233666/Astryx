@@ -93,6 +93,7 @@ export default function Home() {
   const [reading, setReading] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [view, setView] = useState("form");
 
   async function handleGenerate(e) {
     e.preventDefault();
@@ -152,20 +153,8 @@ export default function Home() {
       };
 
       setProfile(newProfile);
+      setView("result");
 
-      const readingRes = await fetch("/api/reading", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          ...form,
-          ...newProfile
-        })
-      });
-
-      const data = await readingRes.json();
-      setReading(data.reading);
     } catch (err) {
       console.error(err);
       setError("Something went wrong while generating your chart.");
@@ -279,12 +268,12 @@ export default function Home() {
           />
         </div>
       </section>
-
+{view === "form" && (
       <section
         id="start"
-        className="relative z-10 mx-auto grid max-w-7xl gap-8 py-20 lg:grid-cols-[0.85fr_1.15fr]"
+        className="relative z-10 flex min-h-screen items-center justify-center px-4"
       >
-        <form onSubmit={handleGenerate} className="glass rounded-[2rem] p-8">
+        <form onSubmit={handleGenerate} className="glass w-full max-w-xl rounded-[2rem] p-8">
           <h2 className="mb-2 font-serif text-4xl">Start your fusion reading</h2>
           <p className="mb-8 text-white/60">
             Enter your birth information to generate your BaZi and astrology profile.
@@ -340,7 +329,17 @@ export default function Home() {
             Note: Results may vary depending on actual circumstances and individual situations.
           </p>
         </form>
-
+  </section>
+)}
+    {view === "result" && profile && (
+      <section className="relative z-10 mx-auto max-w-7xl py-10">
+        <button
+          onClick={() => setView("form")}
+          className="mb-6 rounded-full border border-white/10 px-5 py-2 text-sm text-white/60 hover:border-purple-300/40"
+        >
+          ← Back
+        </button>
+        
         <div className="space-y-6">
           {error && (
             <div className="rounded-2xl border border-red-400/30 bg-red-500/10 p-5 text-red-100">
@@ -439,6 +438,7 @@ export default function Home() {
           <AIReadingCard profile={profile} loading={loading} reading={reading} />
         </div>
       </section>
+)}
       <footer className="mt-10 border-t border-white/10 py-6 text-center text-sm text-white/40">
       <p>
         © {new Date().getFullYear()} Astryx
