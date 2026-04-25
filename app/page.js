@@ -501,6 +501,15 @@ function BaZiEightCharacters({ profile }) {
               <p className="text-xs">
                 {p.branch.yinYang} {p.branch.element} · {p.branch.time}
               </p>
+              {p.branch.hiddenStems && (
+                  <div className="mt-3 space-y-1 text-xs text-white/70">
+                    {p.branch.hiddenStems.map((h, i) => (
+                      <div key={i}>
+                        {h.name} · {h.element} · {h.tenGod}
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
           </div>
         ))}

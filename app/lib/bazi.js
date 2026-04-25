@@ -255,12 +255,48 @@ export function createBaziProfile(birthDate, birthTime, location = null) {
         })
       : null;
 
-  const eightChars = [
-    { pillar: "Year", stem: yearParsed.stem, branch: yearParsed.branch },
-    { pillar: "Month", stem: monthParsed.stem, branch: monthParsed.branch },
-    { pillar: "Day", stem: dayParsed.stem, branch: dayParsed.branch },
-    { pillar: "Hour", stem: hourParsed.stem, branch: hourParsed.branch }
-  ];
+  function enrichBranch(branch, dayMaster) {
+      const hidden = hiddenStems[branch.name] || [];
+
+      const hiddenDetailed = hidden.map((stemName) => {
+        const stem = heavenlyStems.find((s) => s.name === stemName);
+
+        return {
+          name: stem.name,
+          element: stem.element,
+          yinYang: stem.yinYang,
+          tenGod: getTenGod(dayMaster, stem.element, stem.yinYang === "Positive")
+        };
+      });
+
+      return {
+        ...branch,
+        hiddenStems: hiddenDetailed
+      };
+    }
+
+    const eightChars = [
+      {
+        pillar: "Year",
+        stem: yearParsed.stem,
+        branch: enrichBranch(yearParsed.branch, dayParsed.stem.element)
+      },
+      {
+        pillar: "Month",
+        stem: monthParsed.stem,
+        branch: enrichBranch(monthParsed.branch, dayParsed.stem.element)
+      },
+      {
+        pillar: "Day",
+        stem: dayParsed.stem,
+        branch: enrichBranch(dayParsed.branch, dayParsed.stem.element)
+      },
+      {
+        pillar: "Hour",
+        stem: hourParsed.stem,
+        branch: enrichBranch(hourParsed.branch, dayParsed.stem.element)
+      }
+    ];
 
   const dayMaster = dayParsed.stem.element;
 
@@ -367,4 +403,71 @@ export function judgeDayMasterStrength({
     reasons,
     favorable
   };
+}
+
+export const hiddenStems = {
+  Zi: ["Gui"],
+
+  Chou: ["Ji", "Gui", "Xin"],
+
+  Yin: ["Jia", "Bing", "Wu"],
+
+  Mao: ["Yi"],
+
+  Chen: ["Wu", "Yi", "Gui"],
+
+  Si: ["Bing", "Wu", "Geng"],
+
+  Wu: ["Ding", "Ji"],
+
+  Wei: ["Ji", "Ding", "Yi"],
+
+  Shen: ["Geng", "Ren", "Wu"],
+
+  You: ["Xin"],
+
+  Xu: ["Wu", "Xin", "Ding"],
+
+  Hai: ["Ren", "Jia"]
+};
+
+const elementRelation = {
+  generates: {
+    Wood: "Fire",
+    Fire: "Earth",
+    Earth: "Metal",
+    Metal: "Water",
+    Water: "Wood"
+  },
+  controls: {
+    Wood: "Earth",
+    Earth: "Water",
+    Water: "Fire",
+    Fire: "Metal",
+    Metal: "Wood"
+  }
+};
+
+function getTenGod(dayMaster, otherElement, sameYinYang) {
+  if (dayMaster === otherElement) {
+    return sameYinYang ? "Friend" : "Rob Wealth";
+  }
+
+  if (elementRelation.generates[dayMaster] === otherElement) {
+    return sameYinYang ? "Eating God" : "Hurting Officer";
+  }
+
+  if (elementRelation.generates[otherElement] === dayMaster) {
+    return sameYinYang ? "Indirect Resource" : "Direct Resource";
+  }
+
+  if (elementRelation.controls[dayMaster] === otherElement) {
+    return sameYinYang ? "Indirect Wealth" : "Direct Wealth";
+  }
+
+  if (elementRelation.controls[otherElement] === dayMaster) {
+    return sameYinYang ? "Seven Killings" : "Direct Officer";
+  }
+
+  return "Neutral";
 }
