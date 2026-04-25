@@ -67,6 +67,88 @@ const branchMap = {
 };
 
 export const heavenlyStems = Object.values(stemMap);
+export const stemDetails = {
+  Jia: {
+    element: "Wood",
+    polarity: "Positive",
+    direction: "East",
+    organ: "Gallbladder",
+    image: "Tall tree",
+    traits: "upright, ambitious, principled"
+  },
+  Yi: {
+    element: "Wood",
+    polarity: "Negative",
+    direction: "East",
+    organ: "Liver",
+    image: "Flowering vine",
+    traits: "flexible, graceful, resilient"
+  },
+  Bing: {
+    element: "Fire",
+    polarity: "Positive",
+    direction: "South",
+    organ: "Small Intestine",
+    image: "Bright sun",
+    traits: "radiant, warm, expressive"
+  },
+  Ding: {
+    element: "Fire",
+    polarity: "Negative",
+    direction: "South",
+    organ: "Heart",
+    image: "Candle flame",
+    traits: "focused, refined, enduring"
+  },
+  Wu: {
+    element: "Earth",
+    polarity: "Positive",
+    direction: "Center",
+    organ: "Stomach",
+    image: "Mountain earth",
+    traits: "stable, honest, protective"
+  },
+  Ji: {
+    element: "Earth",
+    polarity: "Negative",
+    direction: "Center",
+    organ: "Spleen",
+    image: "Garden soil",
+    traits: "nurturing, inclusive, patient"
+  },
+  Geng: {
+    element: "Metal",
+    polarity: "Positive",
+    direction: "West",
+    organ: "Large Intestine",
+    image: "Iron blade",
+    traits: "strong, decisive, disciplined"
+  },
+  Xin: {
+    element: "Metal",
+    polarity: "Negative",
+    direction: "West",
+    organ: "Lung",
+    image: "Jewelry metal",
+    traits: "precise, elegant, refined"
+  },
+  Ren: {
+    element: "Water",
+    polarity: "Positive",
+    direction: "North",
+    organ: "Bladder",
+    image: "Ocean water",
+    traits: "strategic, flowing, intelligent"
+  },
+  Gui: {
+    element: "Water",
+    polarity: "Negative",
+    direction: "North",
+    organ: "Kidney",
+    image: "Rain and mist",
+    traits: "subtle, wise, hidden"
+  }
+};
 export const earthlyBranches = Object.values(branchMap);
 
 export const chineseHourPeriods = [
@@ -275,26 +357,28 @@ export function createBaziProfile(birthDate, birthTime, location = null) {
       };
     }
 
+    const dayStem = dayParsed.stem;
+
     const eightChars = [
       {
         pillar: "Year",
         stem: yearParsed.stem,
-        branch: enrichBranch(yearParsed.branch, dayParsed.stem.element)
+        branch: enrichBranchWithHiddenStems(yearParsed.branch, dayStem)
       },
       {
         pillar: "Month",
         stem: monthParsed.stem,
-        branch: enrichBranch(monthParsed.branch, dayParsed.stem.element)
+        branch: enrichBranchWithHiddenStems(monthParsed.branch, dayStem)
       },
       {
         pillar: "Day",
         stem: dayParsed.stem,
-        branch: enrichBranch(dayParsed.branch, dayParsed.stem.element)
+        branch: enrichBranchWithHiddenStems(dayParsed.branch, dayStem)
       },
       {
         pillar: "Hour",
         stem: hourParsed.stem,
-        branch: enrichBranch(hourParsed.branch, dayParsed.stem.element)
+        branch: enrichBranchWithHiddenStems(hourParsed.branch, dayStem)
       }
     ];
 
@@ -470,4 +554,38 @@ function getTenGod(dayMaster, otherElement, sameYinYang) {
   }
 
   return "Neutral";
+}
+
+function getTenGodFromStem(dayStem, targetStem) {
+  return getTenGod(
+    dayStem.element,
+    targetStem.element,
+    dayStem.yinYang === targetStem.yinYang
+  );
+}
+
+export function enrichBranchWithHiddenStems(branch, dayStem) {
+  const stems = hiddenStems[branch.name] || [];
+
+  return {
+    ...branch,
+    hiddenStems: stems.map((stemName, index) => {
+      const stem = heavenlyStems.find((s) => s.name === stemName);
+
+      return {
+        order:
+          index === 0
+            ? "Main Qi"
+            : index === 1
+              ? "Middle Qi"
+              : "Residual Qi",
+        name: stem.name,
+        symbol: stem.symbol,
+        element: stem.element,
+        polarity: stem.yinYang,
+        tenGod: getTenGodFromStem(dayStem, stem),
+        details: stemDetails[stem.name]
+      };
+    })
+  };
 }
