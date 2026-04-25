@@ -917,7 +917,7 @@ function AIReadingCard({ profile, loading, reading }) {
             </div>
 
             <div>
-              <h2 className="font-serif text-3xl">AI Fusion Reading</h2>
+              <h2 className="font-serif text-3xl">Fusion Reading</h2>
               <p className="mt-1 text-sm text-white/50">
                 BaZi × Astrology × Personalized Guidance
               </p>
@@ -940,7 +940,7 @@ function AIReadingCard({ profile, loading, reading }) {
         {loading && (
           <div className="space-y-4">
             <p className="animate-pulse text-purple-200">
-              AI is weaving your BaZi structure and planetary chart together...
+              Astryx is weaving your BaZi structure and planetary chart together...
             </p>
 
             <div className="space-y-3">
