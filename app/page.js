@@ -434,30 +434,7 @@ export default function Home() {
             </>
           )}
 
-          <div className="glass min-h-[420px] rounded-[2rem] p-8">
-            <div className="mb-6 flex items-center gap-3">
-              <Briefcase className="text-purple-300" />
-              <h2 className="font-serif text-3xl">AI Fusion Reading</h2>
-            </div>
-
-            {!profile && (
-              <p className="text-white/60">
-                Your BaZi and astrology reading will appear here after you submit your birth profile.
-              </p>
-            )}
-
-            {loading && (
-              <p className="animate-pulse text-purple-200">
-                AI is weaving your BaZi and planetary chart together...
-              </p>
-            )}
-
-            {reading && (
-              <div className="whitespace-pre-wrap leading-8 text-white/75">
-                {reading}
-              </div>
-            )}
-          </div>
+          <AIReadingCard profile={profile} loading={loading} reading={reading} />
         </div>
       </section>
     </main>
@@ -772,6 +749,128 @@ function PlanetCard({ planet }) {
       <p className="mt-3 text-sm leading-6 text-white/65">
         This placement reflects your {planet.meaning}.
       </p>
+    </div>
+  );
+}
+
+function AIReadingCard({ profile, loading, reading }) {
+  return (
+    <div className="glass relative overflow-hidden rounded-[2rem] p-8">
+      <div className="absolute right-[-80px] top-[-80px] h-56 w-56 rounded-full bg-purple-500/20 blur-3xl" />
+      <div className="absolute bottom-[-80px] left-[-80px] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
+
+      <div className="relative z-10">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-2xl bg-purple-500/20 p-3 text-purple-200">
+              <Briefcase size={24} />
+            </div>
+
+            <div>
+              <h2 className="font-serif text-3xl">AI Fusion Reading</h2>
+              <p className="mt-1 text-sm text-white/50">
+                BaZi × Astrology × Personalized Guidance
+              </p>
+            </div>
+          </div>
+
+          {profile && (
+            <div className="hidden rounded-full border border-purple-300/30 bg-white/5 px-4 py-2 text-sm text-purple-100 md:block">
+              {profile.dayMaster} · {profile.westernSign}
+            </div>
+          )}
+        </div>
+
+        {!profile && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white/60">
+            Your integrated reading will appear here after you submit your birth profile.
+          </div>
+        )}
+
+        {loading && (
+          <div className="space-y-4">
+            <p className="animate-pulse text-purple-200">
+              AI is weaving your BaZi structure and planetary chart together...
+            </p>
+
+            <div className="space-y-3">
+              <SkeletonLine width="w-full" />
+              <SkeletonLine width="w-11/12" />
+              <SkeletonLine width="w-10/12" />
+              <SkeletonLine width="w-9/12" />
+            </div>
+          </div>
+        )}
+
+        {reading && !loading && (
+          <div className="rounded-[1.5rem] border border-white/10 bg-[#060b1f]/70 p-6">
+            <div className="prose prose-invert max-w-none">
+              <FormattedReading text={reading} />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SkeletonLine({ width }) {
+  return (
+    <div className={`h-4 ${width} animate-pulse rounded-full bg-white/10`} />
+  );
+}
+
+function FormattedReading({ text }) {
+  const lines = text.split("\n");
+
+  return (
+    <div className="space-y-3">
+      {lines.map((line, index) => {
+        const clean = line.trim();
+
+        if (!clean) {
+          return <div key={index} className="h-2" />;
+        }
+
+        if (clean.startsWith("##")) {
+          return (
+            <h3
+              key={index}
+              className="mt-8 font-serif text-2xl text-purple-100 first:mt-0"
+            >
+              {clean.replace(/^##\s*/, "")}
+            </h3>
+          );
+        }
+
+        if (/^\d+\./.test(clean)) {
+          return (
+            <p
+              key={index}
+              className="rounded-xl border border-purple-300/15 bg-purple-500/10 px-4 py-3 text-white/75"
+            >
+              {clean}
+            </p>
+          );
+        }
+
+        if (clean.startsWith("-")) {
+          return (
+            <p
+              key={index}
+              className="ml-4 border-l border-purple-300/30 pl-4 text-white/70"
+            >
+              {clean.replace(/^-\s*/, "")}
+            </p>
+          );
+        }
+
+        return (
+          <p key={index} className="leading-8 text-white/75">
+            {clean}
+          </p>
+        );
+      })}
     </div>
   );
 }

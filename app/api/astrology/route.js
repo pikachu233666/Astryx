@@ -1,4 +1,8 @@
 import * as Astronomy from "astronomy-engine";
+import {
+  Origin,
+  Horoscope
+} from "circular-natal-horoscope-js";
 
 export const runtime = "nodejs";
 
@@ -57,23 +61,76 @@ function longitudeToSign(longitude) {
   };
 }
 
-function calculateAscendant(date, latitude, longitude) {
-  const time = Astronomy.MakeTime(date);
-  const siderealHours = Astronomy.SiderealTime(time);
-  const localSiderealDegrees = normalizeDegrees(siderealHours * 15 + longitude);
+function getUTCDateFromLocal(birthDate, birthTime, timezone) {
+  const [year, month, day] = birthDate.split("-").map(Number);
+  const [hour, minute] = (birthTime || "12:00").split(":").map(Number);
 
-  const obliquity = 23.439291;
-  const theta = (localSiderealDegrees * Math.PI) / 180;
-  const phi = (latitude * Math.PI) / 180;
-  const eps = (obliquity * Math.PI) / 180;
+  const guessUTC = new Date(Date.UTC(year, month - 1, day, hour, minute));
 
-  const ascRad = Math.atan2(
-    -Math.cos(theta),
-    Math.sin(theta) * Math.cos(eps) + Math.tan(phi) * Math.sin(eps)
-  );
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    timeZoneName: "shortOffset"
+  }).formatToParts(guessUTC);
 
-  const ascDeg = normalizeDegrees((ascRad * 180) / Math.PI);
-  return longitudeToSign(ascDeg);
+  const offsetText =
+    parts.find((part) => part.type === "timeZoneName")?.value || "GMT";
+
+  const match = offsetText.match(/GMT([+-]\d{1,2})(?::(\d{2}))?/);
+
+  let offsetHours = 0;
+
+  if (match) {
+    const h = Number(match[1]);
+    const m = Number(match[2] || 0);
+    offsetHours = h + Math.sign(h || 1) * (m / 60);
+  }
+
+  return new Date(Date.UTC(year, month - 1, day, hour - offsetHours, minute));
+}
+
+function getAscendantWithLibrary({ birthDate, birthTime, location }) {
+  const [year, month, day] = birthDate.split("-").map(Number);
+  const [hour, minute] = (birthTime || "12:00").split(":").map(Number);
+
+  const origin = new Origin({
+    year,
+    month: month - 1,
+    date: day,
+    hour,
+    minute,
+    latitude: Number(location.latitude),
+    longitude: Number(location.longitude)
+  });
+
+  const horoscope = new Horoscope({
+    origin,
+    houseSystem: "placidus",
+    zodiac: "tropical"
+  });
+
+  const ascendantPoint =
+    horoscope?.Angles?.Ascendant ||
+    horoscope?.angles?.Ascendant ||
+    horoscope?.Ascendant ||
+    horoscope?.ascendant;
+
+  const rawSign =
+    ascendantPoint?.Sign?.label ||
+    ascendantPoint?.sign?.label ||
+    ascendantPoint?.Sign?.Label ||
+    ascendantPoint?.sign ||
+    null;
+
+  const rawDegree =
+    ascendantPoint?.ChartPosition?.Ecliptic?.DecimalDegrees ||
+    ascendantPoint?.chartPosition?.Ecliptic?.DecimalDegrees ||
+    ascendantPoint?.ChartPosition?.Horizon?.DecimalDegrees ||
+    null;
+
+  return {
+    sign: typeof rawSign === "string" ? rawSign : "Unknown",
+    degree: rawDegree !== null ? Number(rawDegree.toFixed(2)) : null
+  };
 }
 
 export async function POST(req) {
@@ -84,9 +141,13 @@ export async function POST(req) {
     const birthTime = body.birthTime || "12:00";
     const location = body.location;
 
-    const date = new Date(`${birthDate}T${birthTime}:00Z`);
+    const date = getUTCDateFromLocal(
+      birthDate,
+      birthTime,
+      location?.timezone || "UTC"
+    );
 
-    const planetarySigns = planets.map((planet, index) => {
+    const planetarySigns = planets.map((planet) => {
       const vector = Astronomy.GeoVector(planet, date, true);
       const ecliptic = Astronomy.Ecliptic(vector);
       const zodiac = longitudeToSign(ecliptic.elon);
@@ -111,11 +172,11 @@ export async function POST(req) {
     let ascendantDegree = null;
 
     if (location?.latitude && location?.longitude) {
-      const asc = calculateAscendant(
-        date,
-        Number(location.latitude),
-        Number(location.longitude)
-      );
+      const asc = getAscendantWithLibrary({
+        birthDate,
+        birthTime,
+        location
+      });
 
       ascendant = asc.sign;
       ascendantDegree = asc.degree;
