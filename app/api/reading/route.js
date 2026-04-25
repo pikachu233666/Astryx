@@ -64,6 +64,12 @@ Support Count: ${body.strength?.supportCount ?? "Unknown"}
 Reasons:
 ${JSON.stringify(body.strength?.reasons || [], null, 2)}
 
+Luck Cycle:
+${JSON.stringify(body.luckCycle || {}, null, 2)}
+
+Useful Elements:
+${JSON.stringify(body.usefulElements || {}, null, 2)}
+
 Favorable Direction:
 ${body.strength?.favorable || "Unknown"}
 
@@ -134,6 +140,16 @@ Describe ONE key internal conflict
 
 9. 30-Day Action Plan
 Give 5 specific, realistic actions
+
+10. Major Luck Cycle
+Explain the luck cycle direction, start age, and first few ten-year cycles.
+
+11. Useful Element Strategy
+Explain the favorable elements and how they guide personality, career, and decision-making.
+
+12. Personality and Wellness Reflection
+Give a gentle wellness-oriented reflection based on element balance.
+Do not provide diagnosis or medical advice.
 
 ---
 

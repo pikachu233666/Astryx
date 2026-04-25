@@ -113,11 +113,17 @@ export default function Home() {
           });
 
           if (locationRes.ok) {
-            location = await locationRes.json();
+        
+    location = await locationRes.json();
           }
         }
 
-        const bazi = createBaziProfile(form.birthDate, form.birthTime, location);
+        const bazi = createBaziProfile(
+          form.birthDate,
+          form.birthTime,
+          location,
+          form.gender
+        );
 
       const astrologyRes = await fetch("/api/astrology", {
         method: "POST",
@@ -408,7 +414,7 @@ export default function Home() {
               </div>
 
               <DayMasterStrength profile={profile} />
-
+              <LuckCycleCard profile={profile} />
               <div className="glass rounded-[2rem] p-6">
                 <h3 className="mb-5 font-serif text-3xl">Five Elements Balance</h3>
                 <div className="grid gap-4 md:grid-cols-5">
@@ -880,6 +886,80 @@ function FormattedReading({ text }) {
           </p>
         );
       })}
+    </div>
+  );
+}
+
+function LuckCycleCard({ profile }) {
+  if (!profile.luckCycle) return null;
+
+  return (
+    <div className="glass rounded-[2rem] p-6">
+      <h3 className="mb-5 font-serif text-3xl">Major Luck Cycle</h3>
+
+      <div className="grid gap-5 md:grid-cols-3">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <p className="text-sm text-white/50">Direction</p>
+          <h4 className="mt-1 font-serif text-2xl text-purple-100">
+            {profile.luckCycle.direction}
+          </h4>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <p className="text-sm text-white/50">Start Age</p>
+          <h4 className="mt-1 font-serif text-2xl text-purple-100">
+            {profile.luckCycle.startAge.text}
+          </h4>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <p className="text-sm text-white/50">Reference Solar Term</p>
+          <h4 className="mt-1 font-serif text-2xl text-purple-100">
+            {profile.luckCycle.referenceSolarTerm?.nameEN || "Unknown"}
+          </h4>
+          <p className="mt-2 text-xs text-white/50">
+            {profile.luckCycle.referenceSolarTerm?.date}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-4">
+        {profile.luckCycle.cycles.map((cycle) => (
+          <div
+            key={cycle.order}
+            className="rounded-2xl border border-white/10 bg-white/5 p-4"
+          >
+            <p className="text-xs text-white/50">Cycle {cycle.order}</p>
+            <h4 className="mt-1 font-serif text-2xl text-purple-100">
+              {cycle.pillar}
+            </h4>
+            <p className="mt-2 text-sm text-white/60">
+              Age {cycle.ageRange}
+            </p>
+            <p className="mt-1 text-xs text-white/45">
+              {cycle.element} · {cycle.animal}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {profile.usefulElements && (
+        <div className="mt-6 rounded-2xl border border-purple-300/20 bg-purple-500/10 p-5">
+          <p className="text-sm text-white/50">Useful Element Strategy</p>
+          <h4 className="mt-1 font-serif text-2xl text-purple-100">
+            {profile.usefulElements.type}
+          </h4>
+          <p className="mt-3 text-sm leading-6 text-white/65">
+            {profile.usefulElements.explanation}
+          </p>
+          <p className="mt-3 text-sm text-purple-100">
+            Favorable Elements: {profile.usefulElements.favorableElements.join(", ")}
+          </p>
+          <p className="mt-1 text-sm text-white/60">
+            Strategy: {profile.usefulElements.strategy}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

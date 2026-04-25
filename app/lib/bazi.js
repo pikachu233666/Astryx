@@ -1,4 +1,5 @@
 import { Solar } from "lunar-javascript";
+import { generateLuckCycles, getUsefulElements } from "./luckCycle";
 
 export const fiveElements = {
   Wood: {
@@ -303,7 +304,7 @@ function createSolarWithTime(birthDate, birthTime, location) {
   return Solar.fromYmdHms(year, month, day, hour, minute, 0);
 }
 
-export function createBaziProfile(birthDate, birthTime, location = null) {
+export function createBaziProfile(birthDate, birthTime, location = null, gender = "Not specified") {
   const [year, month, day] = birthDate.split("-").map(Number);
   const solar = createSolarWithTime(birthDate, birthTime, location);
   const lunar = solar.getLunar();
@@ -404,22 +405,34 @@ export function createBaziProfile(birthDate, birthTime, location = null) {
     elementCount
   });
 
-  return {
-    eightChars,
-    dayMaster,
-    dayStem: `${dayParsed.stem.name} ${dayParsed.stem.element}`,
-    dayStemCN: dayParsed.stem.symbol,
-    dominantElement: Object.entries(elementCount).sort((a, b) => b[1] - a[1])[0][0],
-    elementCount,
-    hourInfo,
-    rawGanZhi: {
-      year: `${yearParsed.stem.name} ${yearParsed.branch.name}`,
-      month: `${monthParsed.stem.name} ${monthParsed.branch.name}`,
-      day: `${dayParsed.stem.name} ${dayParsed.branch.name}`,
-      hour: `${hourParsed.stem.name} ${hourParsed.branch.name}`
-    },
-    strength
-  };
+    const luckCycle = generateLuckCycles({
+      birthDate,
+      gender,
+      yearStem: yearParsed.stem,
+      monthStem: monthParsed.stem,
+      monthBranch: monthParsed.branch
+    });
+
+    const usefulElements = getUsefulElements(dayMaster, strength.status);
+
+return {
+  eightChars,
+  dayMaster,
+  dayStem: `${dayParsed.stem.name} ${dayParsed.stem.element}`,
+  dayStemCN: dayParsed.stem.symbol,
+  dominantElement: Object.entries(elementCount).sort((a, b) => b[1] - a[1])[0][0],
+  elementCount,
+  hourInfo,
+  rawGanZhi: {
+    year: `${yearParsed.stem.name} ${yearParsed.branch.name}`,
+    month: `${monthParsed.stem.name} ${monthParsed.branch.name}`,
+    day: `${dayParsed.stem.name} ${dayParsed.branch.name}`,
+    hour: `${hourParsed.stem.name} ${hourParsed.branch.name}`
+  },
+  strength,
+  luckCycle,
+  usefulElements
+};
 }
 
 export function judgeDayMasterStrength({
