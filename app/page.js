@@ -154,6 +154,20 @@ export default function Home() {
 
       setProfile(newProfile);
       setView("result");
+      const readingRes = await fetch("/api/reading", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            ...form,
+            ...newProfile
+          })
+        });
+
+        const data = await readingRes.json();
+        setReading(data.reading);
+
 
     } catch (err) {
       console.error(err);
@@ -434,7 +448,7 @@ export default function Home() {
               </div>
             </>
           )}
-
+          
           <AIReadingCard profile={profile} loading={loading} reading={reading} />
         </div>
       </section>
