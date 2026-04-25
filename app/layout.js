@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "ZodiaScope AI",
-  description: "BaZi Four Pillars meets Western Astrology powered by AI"
+  title: "Astryx",
+  description: "Eastern and Western astrology combined for interpretation"
 };
 
 export default function RootLayout({ children }) {

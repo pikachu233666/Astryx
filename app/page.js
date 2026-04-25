@@ -190,7 +190,7 @@ export default function Home() {
 
       <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between border-b border-purple-400/30 pb-5">
         <div className="flex items-center gap-2 font-serif text-2xl">
-          ZodiaScope AI
+          Astryx
           <Sparkles className="text-purple-300" />
         </div>
 
@@ -214,16 +214,15 @@ export default function Home() {
         >
           <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-4 py-2 text-sm text-purple-200">
             <Stars size={16} />
-            BaZi Eight Characters × Real Planetary Signs × AI
+            BaZi Eight Characters × Planetary Signs
           </p>
 
           <h1 className="font-serif text-5xl leading-tight text-glow md:text-7xl">
-            Decode your destiny through birth time.
+            Eastern and Western astrology combined for interpretation
           </h1>
 
           <p className="mt-6 max-w-xl text-lg leading-8 text-white/70">
-            A dual-core self-discovery platform combining Chinese BaZi and Western
-            astrology into one integrated cosmic profile.
+            Interpret the silent calculus of destiny embedded in the coordinates of your birth time.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
@@ -254,7 +253,7 @@ export default function Home() {
           <div className="mt-8 grid grid-cols-3 gap-3 text-center text-sm">
             <MiniCard title="BaZi" value="Eight Characters" />
             <MiniCard title="Astrology" value="Planet Signs" />
-            <MiniCard title="AI" value="Fusion" />
+            <MiniCard title="Analyse" value="Fusion" />
           </div>
         </motion.div>
       </section>
@@ -271,12 +270,12 @@ export default function Home() {
           <FeatureCard
             icon={<Compass />}
             title="BaZi System"
-            text="Generate Eight Characters, Yin-Yang Five Elements, Chinese Zodiac, and Day Master strength."
+            text="Bazi uses eight characters based on the exact solar term and time of birth to map and interpret the trajectory of a person’s life."
           />
           <FeatureCard
             icon={<Stars />}
             title="Astrology System"
-            text="Calculate real planetary zodiac signs using an astronomy engine, then explain each placement."
+            text="Astrology System uses celestial positions at the time of birth to interpret patterns and tendencies that shape a person’s life path."
           />
         </div>
       </section>
@@ -338,9 +337,7 @@ export default function Home() {
           </button>
 
           <p className="mt-5 text-xs leading-6 text-white/40">
-            Demo note: planetary signs are calculated from astronomical ecliptic longitude.
-            Ascendant and house accuracy require birth coordinates, timezone conversion,
-            and a house system.
+            Note: Results may vary depending on actual circumstances and individual situations.
           </p>
         </form>
 
@@ -353,6 +350,8 @@ export default function Home() {
 
           {profile && (
             <>
+              <FiveElementCycle />
+              
               <BaZiEightCharacters profile={profile} />
 
               {profile.hourInfo && (
@@ -424,8 +423,6 @@ export default function Home() {
                 </div>
               </div>
 
-              <FiveElementCycle />
-
               <NatalWheel profile={profile} />
 
               <div className="glass rounded-[2rem] p-6">
@@ -443,6 +440,14 @@ export default function Home() {
           <AIReadingCard profile={profile} loading={loading} reading={reading} />
         </div>
       </section>
+      <footer className="mt-10 border-t border-white/10 py-6 text-center text-sm text-white/40">
+      <p>
+        © {new Date().getFullYear()} Astryx
+      </p>
+      <p className="mt-1">
+        Created by Yubo Sun & Yuxin Liu
+      </p>
+    </footer>
     </main>
   );
 }

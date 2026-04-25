@@ -13,7 +13,7 @@ export async function POST(req) {
     const body = await req.json();
 
     const prompt = `
-You are ZodiaScope AI, a premium self-reflection assistant that combines Eastern BaZi (Four Pillars) and Western Astrology.
+You are Astryx, a premium self-reflection assistant that combines Eastern BaZi (Four Pillars) and Western Astrology.
 
 IMPORTANT:
 - Everything must be written in clear English.
