@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Sparkles,
   Calendar,
@@ -971,53 +973,91 @@ function SkeletonLine({ width }) {
 function FormattedReading({ text }) {
   const sections = text.split("\n---\n");
 
+  const toc = sections.map((sec, i) => {
+    const titleLine = sec.split("\n").find((l) => l.startsWith("##"));
+    return {
+      id: `section-${i}`,
+      title: titleLine
+        ? titleLine.replace(/^##\s*/, "")
+        : `Section ${i + 1}`
+    };
+  });
+
   return (
-    <div className="space-y-6">
-      {sections.map((section, index) => (
-            <div
-              key={index}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-purple-400/30 hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]"
+    <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
+      
+      <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.03] p-4 lg:sticky lg:top-6">
+        <p className="mb-3 text-sm font-medium text-purple-200">
+          Table of Contents
+        </p>
+
+        <div className="space-y-2">
+          {toc.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className="block rounded-xl px-3 py-2 text-sm text-white/55 transition hover:bg-purple-500/10 hover:text-purple-100"
             >
-          <MarkdownSection content={section} />
+              {item.title}
+            </a>
+          ))}
         </div>
-      ))}
+      </aside>
+
+      <div className="space-y-6">
+        {sections.map((section, index) => (
+          <div
+            key={index}
+            id={`section-${index}`}
+            className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-purple-400/30 hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]"
+          >
+            <MarkdownSection content={section} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 function MarkdownSection({ content }) {
-  const lines = content.split("\n");
-
   return (
-    <div className="space-y-3">
-      {lines.map((line, i) => {
-        const clean = line.trim();
-
-        if (!clean) return null;
-
-        if (clean.startsWith("##")) {
-          return (
-            <h3 key={i} className="font-serif text-2xl text-purple-100">
-              {clean.replace(/^##\s*/, "")}
-            </h3>
-          );
-        }
-
-        if (clean.startsWith("-")) {
-          return (
-            <p key={i} className="ml-4 text-white/70">
-              • {clean.replace(/^-\s*/, "")}
-            </p>
-          );
-        }
-
-        return (
-          <p key={i} className="text-white/75 leading-7">
-            {clean}
-          </p>
-        );
-      })}
-    </div>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        h2: ({ children }) => (
+          <h2 className="mb-3 font-serif text-2xl text-purple-100">
+            {children}
+          </h2>
+        ),
+        h3: ({ children }) => (
+          <h3 className="mb-2 font-serif text-xl text-purple-200">
+            {children}
+          </h3>
+        ),
+        p: ({ children }) => (
+          <p className="leading-7 text-white/75">{children}</p>
+        ),
+        strong: ({ children }) => (
+          <strong className="font-semibold text-white">{children}</strong>
+        ),
+        em: ({ children }) => (
+          <em className="italic text-purple-200">{children}</em>
+        ),
+        ul: ({ children }) => (
+          <ul className="ml-5 list-disc space-y-2 text-white/70">
+            {children}
+          </ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="ml-5 list-decimal space-y-2 text-white/70">
+            {children}
+          </ol>
+        ),
+        li: ({ children }) => <li>{children}</li>
+      }}
+    >
+      {content}
+    </ReactMarkdown>
   );
 }
 
