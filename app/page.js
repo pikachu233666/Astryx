@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import jsPDF from "jspdf";
+import { translations } from "./lib/i18n";
 import {
   Sparkles,
   Calendar,
@@ -84,6 +85,8 @@ function createStars() {
 const stars = createStars();
 
 export default function Home() {
+  const [lang, setLang] = useState("en");
+  const t = translations[lang];
   const [form, setForm] = useState({
     name: "",
     gender: "",
@@ -262,7 +265,8 @@ function handleDownloadPDF() {
           },
           body: JSON.stringify({
             ...form,
-            ...newProfile
+            ...newProfile,
+            language: lang
           })
         });
 
@@ -297,9 +301,14 @@ function handleDownloadPDF() {
           Astryx
           <Sparkles className="text-purple-300" />
         </div>
-
+        <button
+          onClick={() => setLang(lang === "en" ? "zh" : "en")}
+          className="rounded-full border border-purple-400/40 px-4 py-2 text-sm text-white/70 transition hover:border-purple-300 hover:text-white"
+        >
+          {lang === "en" ? "中文" : "EN"}
+        </button>
         <div className="hidden items-center gap-8 text-sm text-white/70 md:flex">
-          <a href="/about">About</a>
+          <a href="/about">{t.navAbout}</a>
           <a href="#start">Reading</a>
           <a
             href="#start"
@@ -334,7 +343,7 @@ function handleDownloadPDF() {
               href="#start"
               className="rounded-full bg-purple-500 px-7 py-3 font-medium shadow-[0_0_35px_rgba(168,85,247,0.65)] transition hover:bg-purple-400"
             >
-              Start Your Reading
+              {t.formTitle}
             </a>
 
             <a
@@ -395,9 +404,9 @@ function handleDownloadPDF() {
           </p>
 
           <Input
-            label="Name"
+            label={t.name}
             type="text"
-            placeholder="Luna"
+            placeholder={t.namePlaceholder}
             icon={<Sparkles size={18} />}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}

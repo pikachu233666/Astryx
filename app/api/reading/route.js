@@ -91,6 +91,7 @@ Mars: ${body.marsSign || "Unknown"}
 Planetary Positions:
 ${JSON.stringify(body.planetarySigns || [], null, 2)}
 
+Output language: ${body.language === "zh" ? "Chinese" : "English"}
 ---
 
 WRITE THE READING USING THESE SECTIONS:
