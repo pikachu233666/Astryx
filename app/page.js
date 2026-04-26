@@ -580,7 +580,7 @@ function handleDownloadPDF() {
             </>
           )}
           
-          <AIReadingCard profile={profile} loading={loading} reading={reading} onDownload={handleDownloadPDF} />
+          <AIReadingCard profile={profile} loading={loading} reading={reading} onDownload={handleDownloadPDF} handleGenerateMandarinReading={handleGenerateMandarinReading} />
         </div>
       </section>
 )}
@@ -1032,7 +1032,7 @@ function PlanetCard({ planet }) {
   );
 }
 
-function AIReadingCard({ profile, loading, reading, onDownload }) {
+function AIReadingCard({ profile, loading, reading, onDownload, handleGenerateMandarinReading }) {
   return (
     <div className="glass relative overflow-hidden rounded-[2rem] p-8">
       <div className="absolute right-[-80px] top-[-80px] h-56 w-56 rounded-full bg-purple-500/20 blur-3xl" />
