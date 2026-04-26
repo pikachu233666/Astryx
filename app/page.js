@@ -580,14 +580,6 @@ function handleDownloadPDF() {
             </>
           )}
           
-          <button
-              onClick={handleGenerateMandarinReading}
-              disabled={loading || !profile}
-              className="w-full rounded-full border border-purple-300/30 px-6 py-4 font-medium text-purple-100 transition hover:bg-purple-500/10 disabled:opacity-50"
-            >
-              Generate Mandarin Fusion Reading
-            </button>
-          
           <AIReadingCard profile={profile} loading={loading} reading={reading} onDownload={handleDownloadPDF} />
         </div>
       </section>
@@ -1062,6 +1054,13 @@ function AIReadingCard({ profile, loading, reading, onDownload }) {
                   >
                     Download PDF Report
                   </button>
+                <button
+                  onClick={handleGenerateMandarinReading}
+                  disabled={loading || !profile}
+                  className="mt-4 rounded-full border border-purple-300/30 px-5 py-2 text-sm text-purple-100 transition hover:bg-purple-500/10"
+                >
+                  Mandarin Fusion Reading
+                </button>
                 )}
               <p className="mt-1 text-sm text-white/50">
                 BaZi × Astrology × Personalized Guidance
