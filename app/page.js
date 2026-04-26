@@ -299,7 +299,7 @@ function handleDownloadPDF() {
         </div>
 
         <div className="hidden items-center gap-8 text-sm text-white/70 md:flex">
-          <a href="#about">About</a>
+          <a href="/about">About</a>
           <a href="#start">Reading</a>
           <a
             href="#start"
