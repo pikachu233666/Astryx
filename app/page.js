@@ -1048,19 +1048,22 @@ function AIReadingCard({ profile, loading, reading, onDownload, handleGenerateMa
             <div>
               <h2 className="font-serif text-3xl">Fusion Reading</h2>
               {(profile || reading) && (
-                  <button
-                    onClick={onDownload}
-                    className="mt-4 rounded-full border border-purple-300/30 px-5 py-2 text-sm text-purple-100 transition hover:bg-purple-500/10"
-                  >
-                    Download PDF Report
-                  </button>
-                <button
-                  onClick={handleGenerateMandarinReading}
-                  disabled={loading || !profile}
-                  className="mt-4 rounded-full border border-purple-300/30 px-5 py-2 text-sm text-purple-100 transition hover:bg-purple-500/10"
-                >
-                  Mandarin Fusion Reading
-                </button>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      onClick={onDownload}
+                      className="rounded-full border border-purple-300/30 px-5 py-2 text-sm text-purple-100 transition hover:bg-purple-500/10"
+                    >
+                      Download PDF Report
+                    </button>
+
+                    <button
+                      onClick={handleGenerateMandarinReading}
+                      disabled={loading || !profile}
+                      className="rounded-full border border-purple-300/30 px-5 py-2 text-sm text-purple-100 transition hover:bg-purple-500/10 disabled:opacity-50"
+                    >
+                      Mandarin Fusion Reading
+                    </button>
+                  </div>
                 )}
               <p className="mt-1 text-sm text-white/50">
                 BaZi × Astrology × Personalized Guidance
