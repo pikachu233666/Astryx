@@ -160,7 +160,7 @@ Make it feel like a modern psychology + culture fusion analysis.
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
+      model: "gemma-4-31b",
       contents: prompt
     });
 
