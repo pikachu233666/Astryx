@@ -22,8 +22,10 @@ IMPORTANT FORMAT RULES:
 - Do NOT skip separators
 
 IMPORTANT:
-- Everything must be written in clear English.
-- Do NOT use Chinese characters or Chinese metaphysics terms.
+- Output language: ${body.language === "zh" ? "Mandarin Chinese" : "clear English"}.
+${body.language === "zh"
+  ? "- Use natural Mandarin Chinese. You may include BaZi terms such as 八字, 五行, 十神, 日主, 身强, 身弱 when helpful."
+  : "- Do NOT use Chinese characters or Chinese metaphysics terms."}
 - Replace traditional terms with English explanations:
   - "Seasonal Support" instead of 得令
   - "Root Support" instead of 得地
@@ -154,7 +156,7 @@ Do not provide diagnosis or medical advice.
 ---
 
 Make it detailed but clean.
-No Chinese words.
+${body.language === "zh" ? "Use Mandarin Chinese." : "No Chinese words."}
 No metaphysical jargon.
 Make it feel like a modern psychology + culture fusion analysis.
 `;

@@ -196,6 +196,36 @@ function handleDownloadPDF() {
   pdf.save("astryx-fusion-report.pdf");
 }
 
+    async function handleGenerateMandarinReading() {
+      if (!profile) return;
+
+      setLoading(true);
+      setReading("");
+      setError("");
+
+      try {
+        const readingRes = await fetch("/api/reading", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            ...form,
+            ...profile,
+            language: "zh"
+          })
+        });
+
+        const data = await readingRes.json();
+        setReading(data.reading);
+      } catch (err) {
+        console.error(err);
+        setError("Mandarin AI reading failed.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
   async function handleGenerate(e) {
     e.preventDefault();
     if (!form.birthDate) return;
@@ -549,6 +579,14 @@ function handleDownloadPDF() {
               </div>
             </>
           )}
+          
+          <button
+              onClick={handleGenerateMandarinReading}
+              disabled={loading || !profile}
+              className="w-full rounded-full border border-purple-300/30 px-6 py-4 font-medium text-purple-100 transition hover:bg-purple-500/10 disabled:opacity-50"
+            >
+              Generate Mandarin Fusion Reading
+            </button>
           
           <AIReadingCard profile={profile} loading={loading} reading={reading} onDownload={handleDownloadPDF} />
         </div>
